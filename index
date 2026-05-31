@@ -2,15 +2,15 @@
 <html>
 
 <head>
-    <title>League of Legeneds: The Data</title>
+    <title>League Website</title>
 </head>
 
 <body>
-    <h1>First Pick Significance</h1>
-</body>
+    <h1>League of Legends: The Data</h1>
 
-<body>
-    <h1>First Pick Role Signifance</h1>
+    <h2>First Pick Significance</h2>
+
+    <h2>First Pick Role Signifance</h2>
 </body>
 
 </html>
