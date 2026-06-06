@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>League of Legends: Predicting Match Outcomes Before the Game Begins | LoL-Professional-Match-Analysis</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="League of Legends: Predicting Match Outcomes Before the Game Begins" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="UCSD - Spring 2026 - DSC80" />
+<meta property="og:description" content="UCSD - Spring 2026 - DSC80" />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="LoL-Professional-Match-Analysis" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="League of Legends: Predicting Match Outcomes Before the Game Begins" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"UCSD - Spring 2026 - DSC80","headline":"League of Legends: Predicting Match Outcomes Before the Game Begins","name":"LoL-Professional-Match-Analysis","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/assets/css/style.css?v=066335fef99aa865461d72abf394feb03200225d">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">League of Legends: Predicting Match Outcomes Before the Game Begins</h1>
+      <h2 class="project-tagline"> UCSD - Spring 2026 - DSC80 </h2>
+      
+        <a href="https://github.com/andrewmcolvin/LoL-Professional-Match-Analysis" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      
+<h1 id="league-of-legends-predicting-match-outcomes-before-the-game-begins">League of Legends: Predicting Match Outcomes Before the Game Begins</h1>
+
+<p>Author: Andrew Colvin</p>
+
+<p>This analysis of League of Legends professional matches was created as a project requirement for UCSD Data Science class DSC80. It aims to explore the data to try to find information that teams may find useful during their pre-match strategizing. I focus almost exclusively on the data that is attained prior to the start of the game.</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>League of Legends is massively popular MOBA style online video game that pits two groups of five competing to destroy the other team’s nexus. Before the chaos of the match ensues, the teams must draft their champions and are able to restrict the champions their opponents are able to choose through a process called banning. This stage of the game is an incredible pivotal time, as this determines the caliber of champions that will be utilized. In every match, each team has five roles that are fulfilled by these champions: top, jungle, mid, bot, and support. While champions change from match to match, the roles stay constant and are central to the game balance and design.</p>
+
+<p>The data used for this study is from professional League of Legends matches from 2022 and sourced from Oracle’s Elixir database. The initial dataset had over 150,000 rows and more than 150 columns with information ranging from individual player names to amount of gold acquired throughout a given match.</p>
+
+<p>By utilizing this data, my project is aims to answer the question: <strong>How accurately can the winner of a League of Legends match be predicted using only information available before the match begins?</strong></p>
+
+<p>I restricted my analysis to pre-match information to research if this data can give us an insight to how much a game’s outcome may already be determined before players enter the Summoner’s Rift.</p>
+
+<p>The pre-match columns that will be utilized are:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">gameid</code>: the unique id number shared between all players and teams that were apart of the game.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">teamid</code>: the unique id number for each team that competed in the dataset.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">firstPick</code>: a binary variable, <code class="language-plaintext highlighter-rouge">1</code> if the team was the first to select during the pick process and <code class="language-plaintext highlighter-rouge">0</code> if team did not have first pick.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">pick1</code> - <code class="language-plaintext highlighter-rouge">pick5</code> the five champions selected by a team during the draft, in order of pick.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ban1</code>- <code class="language-plaintext highlighter-rouge">ban5</code>: the five champions banned by a team during the draft, in order of ban.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">league</code>: professional league that the match was played in.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">playoffs</code>: a binary variable, <code class="language-plaintext highlighter-rouge">1</code> if the match recorded was a playoff match and <code class="language-plaintext highlighter-rouge">0</code> if it was not.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">patch</code>: the game version that the match was played on.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">result</code>: the outcome variable, also binary; <code class="language-plaintext highlighter-rouge">1</code> if the team won the match and <code class="language-plaintext highlighter-rouge">0</code> if they lost. This is the only column that was not produced before the match started.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">position</code>: the role fulfilled by each player, also denotes team level data. This column was vital in building the cleaned dataset.</p>
+  </li>
+</ul>
+
+<h2 id="data-cleaning-and-exploratory-data-analysis">Data Cleaning and Exploratory Data Analysis</h2>
+<h3 id="data-cleaning">Data Cleaning</h3>
+<p>Given my research focus, I restricted my dataset heavily, only including the above columns. But prior to cutting down columns, I utilized the <code class="language-plaintext highlighter-rouge">datacompleteness</code> category to remove all of the games that had incomplete data, removing 22,000 of our 150,000 observations.</p>
+
+<p>I recognized that I would be working at a team level, meaning large portions of the dataset had either redundant or unnecessary information. Each of the observations was either an individual player row or a team level aggregate row. In other words, each match had 12 rows sharing the same <code class="language-plaintext highlighter-rouge">gameid</code>, 10 rows for the players (5 for each team) and 2 for the teams. I utilized the <code class="language-plaintext highlighter-rouge">position</code> column to isolate only team level rows from the dataset, reducing the working dataset to 21,000 rows.</p>
+
+<p>When verifying that my team level data was clean, I checked that each unique gameid had exactly one team marked as having the first pick of the game. I found that 2,000 matches were missing information in the <code class="language-plaintext highlighter-rouge">firstPick</code> category, but not only that, those same rows were also missing any information about the pick phase in general, meaning I was also missing data from <code class="language-plaintext highlighter-rouge">pick1</code> - <code class="language-plaintext highlighter-rouge">pick5</code> categories. Since my analysis leans so heavily on these categories, I decided to drop these observations, bringing my team level dataset to 17,000 rows.</p>
+
+<p>Currently, the pick and ban columns store information at the champion level, meaning they record the specific champions picked or banned in each match. For my pre-match analysis, I wanted to analyze this information at the role level instead. Since each team must fill the same five roles in every game, role-based features provide a more consistent way to compare teams across matches. Because this information was not directly available in the dataset, I needed to engineer new features that converted champion pick and ban data into role-based data.</p>
+
+<p>In order to build the new pick by role columns (named <code class="language-plaintext highlighter-rouge">pick1_role</code> through <code class="language-plaintext highlighter-rouge">pick5_role</code>), I matched each picked champion in the team level draft data to the corresponding player level row from the same game and team. Since the player level data included both the champion played and the player’s role, I was able to replace each picked champion with the role that champion filled in that specific match. This allowed me to represent draft picks at the role level rather than the champion level.</p>
+
+<p>For the new ban by role columns, there was no player level row I could use to easily assign a role for each banned champion. I decided to build a champion to role map using the player level data. I assigned each champion a role based on the role it most commonly filled across the player level dataset. Since champions can fill multiple roles, this method may introduce some noise, but it gave a consistent way to convert champion bans to bans by role.</p>
+
+<p>I then built those bans into columns counting how many of each role was banned by each team in each game. Those counts became the columns <code class="language-plaintext highlighter-rouge">top_bans</code>, <code class="language-plaintext highlighter-rouge">jng_bans</code>, <code class="language-plaintext highlighter-rouge">mid_bans</code>, <code class="language-plaintext highlighter-rouge">bot_bans</code>, and <code class="language-plaintext highlighter-rouge">sup_bans</code>. Finally, I added a <code class="language-plaintext highlighter-rouge">role_most_banned</code> column indicating which role each team targeted most often with its bans in that game.</p>
+
+<p>After these cleaning steps, each observation in my dataset is represented by one team in one match, making it better for analyzing how different variables differ between winning and losing teams.</p>
+
+<p>These are the first five rows of my cleaned team level dataset:</p>
+
+<style>
+.table-wrapper {
+  overflow-x: auto;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.table-wrapper table {
+  display: inline-table !important;
+  width: max-content !important;
+  min-width: unset !important;
+  border-collapse: collapse !important;
+  margin: 1rem auto !important;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+  border: 1px solid #e5e5e5 !important;
+  padding: 8px 16px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.table-wrapper th {
+  background-color: #f8f8f8 !important;
+  font-weight: bold !important;
+}
+</style>
+
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>gameid</th>
+      <th>league</th>
+      <th>playoffs</th>
+      <th>patch</th>
+      <th>teamid</th>
+      <th>firstPick</th>
+      <th>result</th>
+      <th>pick1_role</th>
+      <th>pick2_role</th>
+      <th>pick3_role</th>
+      <th>pick4_role</th>
+      <th>pick5_role</th>
+      <th>top_bans</th>
+      <th>jng_bans</th>
+      <th>mid_bans</th>
+      <th>bot_bans</th>
+      <th>sup_bans</th>
+      <th>most_banned_role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ESPORTSTMNT01_2690210</td>
+      <td>LCKC</td>
+      <td>0</td>
+      <td>12.01</td>
+      <td>oe:team:fa3d687a87bcae80362f784a7da571d</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>top</td>
+      <td>bot</td>
+      <td>jng</td>
+      <td>mid</td>
+      <td>sup</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>sup</td>
+    </tr>
+    <tr>
+      <td>ESPORTSTMNT01_2690210</td>
+      <td>LCKC</td>
+      <td>0</td>
+      <td>12.01</td>
+      <td>oe:team:7c64febcd5ccff13dcd035dc6867a00</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>bot</td>
+      <td>jng</td>
+      <td>top</td>
+      <td>mid</td>
+      <td>sup</td>
+      <td>0</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+      <td>2</td>
+      <td>mid</td>
+    </tr>
+    <tr>
+      <td>ESPORTSTMNT01_2690219</td>
+      <td>LCKC</td>
+      <td>0</td>
+      <td>12.01</td>
+      <td>oe:team:731b7a9fd004cdbe2bcb3da795bce47</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>jng</td>
+      <td>bot</td>
+      <td>top</td>
+      <td>sup</td>
+      <td>mid</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>sup</td>
+    </tr>
+    <tr>
+      <td>ESPORTSTMNT01_2690219</td>
+      <td>LCKC</td>
+      <td>0</td>
+      <td>12.01</td>
+      <td>oe:team:e7a7c6bf58eb268ed3f13aac4158aa8</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>mid</td>
+      <td>bot</td>
+      <td>jng</td>
+      <td>sup</td>
+      <td>top</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>sup</td>
+    </tr>
+    <tr>
+      <td>ESPORTSTMNT01_2690227</td>
+      <td>LCKC</td>
+      <td>0</td>
+      <td>12.01</td>
+      <td>oe:team:b9733b8e8aa341319bbaf1035198a28</td>
+      <td>1.0</td>
+      <td>1</td>
+      <td>top</td>
+      <td>jng</td>
+      <td>sup</td>
+      <td>bot</td>
+      <td>mid</td>
+      <td>1</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>mid</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="exploratory-data-analysis">Exploratory Data Analysis</h3>
+
+<p>My initial intuition was to see if there was a difference in the outcome of a match based on who had the first pick of the draft.</p>
+
+<iframe src="team-win-rate-by-draft-order.html" width="650" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<p>This bivariate bar chart creates an informative visualization of the difference between having first and second picks. TTeams with the first pick had a win rate that was 4.08 percentage points higher than teams without the first pick. This leads me to believe there may be an association between first pick and game outcome.
+<br /></p>
+
+<hr />
+
+<p><br />
+I decided I wanted to explore how those teams with the first pick faired based on the role of the champion they picked first.</p>
+
+<iframe src="win-rate-by-first-picked-role.html" width="650" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<p>This bivariate graph shows very consistent win rates for bot, jungle, support, and top. The mid role stands out because teams that first picked a mid champion had a win rate below 50%, while the other roles were around 52%.
+<br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<p>Next I wanted to start looking to bans. I was initially curious how professional teams tend to distribute their bans.</p>
+<iframe src="distribution-of-bans-by-role.html" width="600" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<p>This univariate pie chart shows that the breakdown between ban roles is fairly even. The support role is the lowest at 15.2%. Support champions being a less common target for bans may be because bans are targeted towards roles that have a higher chance of “carrying” the team.</p>
+
+<hr />
+
+<p><br /></p>
+
+<p>While ban distribution is interesting, it lead me to wonder if the role that teams targeted most often in their banning phase was associated with game outcome.</p>
+
+<iframe src="win-rate-by-most-frequently-targeted-ban-role.html" width="650" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<p>This bivariate bar chart again shows one role standing out above the rest. With team who’s most targeted ban was a champion associated with the role of jungle led to a 52.79% win rate.</p>
+
+<p><strong>Note:</strong> This chart was built from the <code class="language-plaintext highlighter-rouge">role_most_banned</code> column, which had some limitations. Since there were instances of ties for which role was most banned by a team (ex. each role was banned exactly once during the banning phase), I took the first value in that list of ties.</p>
+
+<h3 id="interesting-aggregates">Interesting Aggregates</h3>
+
+<p>To further investigate importance of role ban allocation, and given the limitations of the <code class="language-plaintext highlighter-rouge">role_most_banned</code> column, I built a data frame to try to assess how the outcome of the match really is associated with bans.</p>
+
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role</th>
+      <th>Wins</th>
+      <th>Losses</th>
+      <th>Difference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Top</td>
+      <td>1.016</td>
+      <td>1.039</td>
+      <td>-0.023</td>
+    </tr>
+    <tr>
+      <td>Jungle</td>
+      <td>0.964</td>
+      <td>0.907</td>
+      <td>0.057</td>
+    </tr>
+    <tr>
+      <td>Mid</td>
+      <td>1.226</td>
+      <td>1.233</td>
+      <td>-0.007</td>
+    </tr>
+    <tr>
+      <td>Bot</td>
+      <td>1.037</td>
+      <td>1.064</td>
+      <td>-0.027</td>
+    </tr>
+    <tr>
+      <td>Support</td>
+      <td>0.758</td>
+      <td>0.758</td>
+      <td>0.000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This table compares the average number of bans each team used on each role, separated by winning and losing teams. Aggregating the actual counts of team bans reduces the noise that limited my previous chart. By showing the difference, we can still see that the gap between winning and losing teams ban rates was largest for the role of jungle.</p>
+
+<h2 id="assessment-of-missingness">Assessment of Missingness</h2>
+<h3 id="nmar-analysis">NMAR Analysis</h3>
+
+<p>The column <code class="language-plaintext highlighter-rouge">teamid</code> could be NMAR. There are many rows where <code class="language-plaintext highlighter-rouge">teamid</code> is missing, but <code class="language-plaintext highlighter-rouge">teamname</code> exists. One possible explanation is that teams that were very recently created or newly registered at the time of their first match. So the missingness in that case would not be MAR but attached to a variable that we don’t currently have access to, or NMAR. We could potentially explain the missing values if we had access to to team creation/registration date.</p>
+
+<h3 id="missingness-dependency">Missingness Dependency</h3>
+
+<p>To find data to analyze for missingness I explored the original dataset. I found that there were multiple columns that took measurements of a game variable at a certain time, meaning if a game does not extend to that time, the data would be missing. This is an example of MAR. One of these columns is <code class="language-plaintext highlighter-rouge">goldat25</code>. I decided to look into <code class="language-plaintext highlighter-rouge">goldat25</code>’s missingness relation ship to <code class="language-plaintext highlighter-rouge">gamelength</code> to see if there might be an association. I explored it further by grouping rows by <code class="language-plaintext highlighter-rouge">goldat25</code> missing vs not missing and ploted the <code class="language-plaintext highlighter-rouge">gamelength</code> for each of these groups.</p>
+
+<iframe src="game-length-by-gold-at-25.html" width="850" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<p>This box plot gives us a good indication that the missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> may be associated with <code class="language-plaintext highlighter-rouge">gamelength</code>.</p>
+
+<h3 id="testing-dependency-dependent">Testing Dependency: Dependent</h3>
+<p>To test this I performed a permutation test with the following hypothesis:</p>
+
+<p><strong>Null Hypothesis:</strong> The missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> is independent of <code class="language-plaintext highlighter-rouge">gamelength</code>.</p>
+
+<p><strong>Alternative Hypothesis:</strong> The missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> depends on <code class="language-plaintext highlighter-rouge">gamelength</code>.</p>
+
+<p><strong>Test Statistic:</strong> Absolute difference between the averages of game length between games that are missing <code class="language-plaintext highlighter-rouge">goldat25</code> data and those that are not missing.</p>
+
+<p><strong>Significance Level:</strong> α =  0.05</p>
+
+<p>The observed statistic for our data for the absolute difference in mean game length between the two groups, was 598 seconds, or close to 10 minutes.</p>
+
+<p>After running a permutation test with 10,000 simulations, I found not a single permutation had a more extreme value than our observed statistic. Meaning the resulting <strong>p-value</strong> was less than 0.0001, much less than our <strong>significance level</strong> of α = 0.05, therefore we <em>reject the null hypothesis</em>. This is strong evidence that the missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> depends on <code class="language-plaintext highlighter-rouge">gamelength</code>.</p>
+
+<p>To further visualize the strength of this association we can look at the histogram of simulations with the observed statistic plotted:</p>
+
+<iframe src="permutation-distribution-for-gold-at-25-missingness.html" width="850" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<h3 id="testing-dependency-independent">Testing Dependency: Independent</h3>
+<p>That same column of <code class="language-plaintext highlighter-rouge">goldat25</code>’s missingness may be dependent on <code class="language-plaintext highlighter-rouge">gamelength</code> but was it independent from any of the columns in our dataset? I decided to check how it was associated with the column <code class="language-plaintext highlighter-rouge">position</code>, which remember just holds the role the competitors are playing. I hypothesized that the missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> should have no association with <code class="language-plaintext highlighter-rouge">position</code>.</p>
+
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>position</th>
+      <th>bot</th>
+      <th>jng</th>
+      <th>mid</th>
+      <th>sup</th>
+      <th>team</th>
+      <th>top</th>
+    </tr>
+    <tr>
+      <th>goldat25_missing</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>False</th>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+    </tr>
+    <tr>
+      <th>True</th>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+      <td>0.166667</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>By grouping the existence of missingness for <code class="language-plaintext highlighter-rouge">goldat25</code> by the <code class="language-plaintext highlighter-rouge">position</code>, we can see the proportion of each position is the same. This leads me to hypothesize that indeed <code class="language-plaintext highlighter-rouge">goldat25</code>’s missingness is not explained by <code class="language-plaintext highlighter-rouge">position</code>.</p>
+
+<p><strong>Null Hypothesis:</strong> The missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> is independent of <code class="language-plaintext highlighter-rouge">position</code>.</p>
+
+<p><strong>Alternative Hypothesis:</strong> The missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> depends on <code class="language-plaintext highlighter-rouge">position</code>.</p>
+
+<p><strong>Test Statistic:</strong> TVD between distributions of positions between games that are missing <code class="language-plaintext highlighter-rouge">goldat25</code> data and those that are not missing.</p>
+
+<p><strong>Significance Level:</strong> α = 0.05</p>
+
+<p><strong>Observed statistic:</strong> TVD = 0.0</p>
+
+<p>After running a permutation test with 10,000 simulations, I found not a single permutation had a less extreme value than our observed statistic. Meaning the resulting <strong>p-value</strong> was 1.0, which is much greater of our <strong>significance level</strong> of α = 0.05, therefore we <em>fail to reject the null hypothesis</em>. This is strong evidence that the missingness of <code class="language-plaintext highlighter-rouge">goldat25</code> is independent of  <code class="language-plaintext highlighter-rouge">position</code>.</p>
+
+<p>To further visualize the strength of this association we can look at the histogram of simulations with the observed statistic plotted:</p>
+
+<iframe src="permutation-distribution-for-gold-at-25-position.html" width="860" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<h2 id="hypothesis-testing">Hypothesis Testing</h2>
+
+<p>During my EDA phase, I found that there were marginal differences in the ban rate of certain roles between winning and losing teams. To assess if this difference is meaningful enough to explore as a feature in my prediction model, we’ll perform a permutation test on the following hypothesis.</p>
+
+<p><strong>Null Hypothesis:</strong> The game outcome is independent of the distribution of bans by role.</p>
+
+<p><strong>Alternative Hypothesis:</strong> The game outcome is dependent on the distribution of bans by role.</p>
+
+<p><strong>Test Statistic:</strong> Sum of the absolute differences between the mean ban rates of winning and losing teams across all roles.</p>
+
+<p><strong>Significance Level:</strong> α = 0.05</p>
+
+<p>After running a permutation test with 10,000 simulations, I found a <strong>p-value</strong> of about 0.01, which is less than our <strong>significance level</strong> of α = 0.05, and therefore we <em>reject the null hypothesis</em>. This is evidence that this difference is unlikely to be due to random chance, and that the game outcome is associated with distribution of bans by role.</p>
+
+<p>Again, plotting the observed statistic on our permutation test to visualize where our observed statistic lands within permutation test.</p>
+
+<iframe src="hypothesis-testing.html" width="850" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+<h2 id="framing-a-prediction-problem">Framing a Prediction Problem</h2>
+
+<p>I set out to predict whether pre-match information can predict the outcome of a League of Legends match. This means my model will only use information known before the game begins, such as draft order, pick roles, ban roles, patch, league, and team. I wont have access to any information generated during the match, such as kills or gold earned.</p>
+
+<p>My response variable, the outcome of the match, is represented by the <code class="language-plaintext highlighter-rouge">result</code> column of the dataset. Therefore since there can be no ties, only winners and losers, we are dealing with a binary classification.</p>
+
+<p>To evaluate my model I used accuracy, as it will measure how often(by proportion) my model predicts the correct result. Since there is a clear distinction between outcomes and the outcomes are balanced, accuracy is the most natural metric to use. F1-score would be more suited if my response variable was not balanced. For instance, if I was trying to predict if the team with first pick won. In my dataset there is an unequal number of teams that had first pick that won and lost.</p>
+
+<p>The task of predicting a winner based only on pre-match data is ambitious, but if the model can perform even marginally better than a coin flip, it suggests that pre-match strategy contains meaningful information about the eventual outcome of a game.</p>
+
+<h2 id="baseline-model">Baseline Model</h2>
+<p>For the baseline model I decided to test the number of bans allocated to each role. This specifically interested me because of the findings from my hypothesis test, where I investigated if ban allocation by role was associated with game outcomes. I used five features in my bare bones baseline model.</p>
+
+<p>Baseline Model Features (type):</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">top_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">jng_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">mid_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">bot_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">sup_bans</code> (quantitative)</li>
+</ul>
+
+<p>I chose to use logistic regression, it naturally works well for my response variable (<code class="language-plaintext highlighter-rouge">result</code>) since it is binary, and used 10 fold cross-validation for prediction training.</p>
+
+<p>My initial model had an average cross-validated accuracy score of 50.7%. Not a very strong model, and only slightly better than a coin flip. So while, the outcome of the match is likely dependent on ban allocation by role, it is not solely able to predict outcome.</p>
+
+<p><br /></p>
+
+<hr />
+<p><br /></p>
+
+<p><strong>Intermediate Model</strong></p>
+
+<p>I decided to try and improve upon the base model by adding more pre-match features. It occurred to me that the most predictive pre-match feature is most likely team strength. For my final model I will implement a way to measure team strength, but first I wanted to see how the model faired with less impactful features. My intermediate model used 13 features.</p>
+
+<p>Intermediate Model Features (type):</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">top_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">jng_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">mid_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">bot_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">sup_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick1_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick2_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick3_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick4_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick5_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">firstPick</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">patch</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">league</code> (nominal)</li>
+</ul>
+
+<p>This model used categorical (nominal) features, so I incorporated <code class="language-plaintext highlighter-rouge">OneHotEncoder</code> to be able to use logistic regression on those features.</p>
+
+<p>My intermediate model achieved an average cross-validated accuracy of 51.2%, so while it did improve it is still not much better than a coin flip.</p>
+
+<h2 id="final-model">Final Model</h2>
+<p>For the final model I added <code class="language-plaintext highlighter-rouge">teamid</code> to the same features used in my intermediate model. Since <code class="language-plaintext highlighter-rouge">teamid</code> is also categorical, I added it to the <code class="language-plaintext highlighter-rouge">OneHotEncoder</code> transformer. By including <code class="language-plaintext highlighter-rouge">teamid</code> I can get a indirect measure of team strength. This enables the model to learn patterns for teams in the training data, which can start to measure a team’s likeliness to win. I continued using logistic regression used in my previous models. My final model used 14 features.</p>
+
+<p>Final Model Features (type):</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">top_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">jng_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">mid_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">bot_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">sup_bans</code> (quantitative)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick1_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick2_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick3_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick4_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">pick5_role</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">firstPick</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">patch</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">league</code> (nominal)</li>
+  <li><code class="language-plaintext highlighter-rouge">teamid</code> (nominal)</li>
+</ul>
+
+<p>The final model achieved an average prediction accuracy, prior to tuning, of 59.1%, which is by far the most meaningful increase seen while modeling. All from just adding one additional feature. This suggests that team strength captures important information about match outcome that draft related features alone do not fully explain.
+<br /></p>
+
+<hr />
+
+<p><br />
+Finally I tested some regularization parameters on my model. I tested six values of <code class="language-plaintext highlighter-rouge">C</code>, increasing by factors of 10 (seen below) as my hyperparamters to tune the model. The value of <code class="language-plaintext highlighter-rouge">C</code> controls how strongly the model tries to fit the training data, so I want to see if there is some value of <code class="language-plaintext highlighter-rouge">C</code> that balances simplicity and flexibility for the model.</p>
+
+<p>The resulting data frame shows that the regularization parameter reaches a maximum for prediction accuracy at around <code class="language-plaintext highlighter-rouge">C = 100</code> where its accuracy is at 59.7%.</p>
+
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>C</th>
+      <th>Accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0.1</td>
+      <td>0.587755</td>
+    </tr>
+    <tr>
+      <td>1.0</td>
+      <td>0.590917</td>
+    </tr>
+    <tr>
+      <td>10.0</td>
+      <td>0.593721</td>
+    </tr>
+    <tr>
+      <td>100.0</td>
+      <td>0.597361</td>
+    </tr>
+    <tr>
+      <td>1000.0</td>
+      <td>0.596764</td>
+    </tr>
+    <tr>
+      <td>10000.0</td>
+      <td>0.595989</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="fairness-analysis">Fairness Analysis</h2>
+
+<p>During the EDA phase, one of the variables that stood out as an interesting grouping was playoff matches vs non-playoff matches. In this section, I evaluated if there is a difference in accuracy for my model when trying to predict these two groups. Since my model’s strongest feature was <code class="language-plaintext highlighter-rouge">teamid</code>, which indirectly measured team strength. I hypothesized that non-playoff games would have a higher prediction accuracy than playoff matches. Playoff teams should generally be closer in team strength to one another, weakening the ability for the model to predict the outcome.</p>
+
+<p><strong>Playoff Groups</strong></p>
+
+<p>X: Non-playoff matches</p>
+
+<p>Y: Playoff matches</p>
+
+<p><strong>Metric:</strong> Accuracy</p>
+
+<p><strong>Null Hypothesis:</strong> Model’s accuracy is the same for both playoff and non-playoff matches.</p>
+
+<p><strong>Alternative Hypothesis:</strong> Model’s accuracy is higher for non-playoff matches than for playoff matches.</p>
+
+<p><strong>Test Statistic:</strong> Difference in accuracy between non-playoff and playoff matches. (Accuracy of non-playoff matches - accuracy of playoff matches)</p>
+
+<p><strong>Significance Level:</strong> α = 0.05</p>
+
+<p>The observed statistic was 0.0546. The model correctly predicted the outcome of non-playoff matches around 5 percentage points higher than playoff matches.</p>
+
+<p>After running a permutation test with 10,000 simulations, I found a <strong>p-value</strong> of less than 0.0001, which is less than our <strong>significance level</strong> of α = 0.05, and therefore we <em>reject the null hypothesis</em>. This is strong evidence that the the model’s accuracy is higher for non-playoff matches than playoff matches.</p>
+
+<p>I created a visual representation of my analysis by plotting the observed statistic on a histogram of the permutations created during our permutation test.</p>
+
+<iframe src="playoff.html" width="850" height="425" frameborder="0" style="display: block; margin: 0 auto; border: 0;"></iframe>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/andrewmcolvin/LoL-Professional-Match-Analysis">LoL-Professional-Match-Analysis</a> is maintained by <a href="https://github.com/andrewmcolvin">andrewmcolvin</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
